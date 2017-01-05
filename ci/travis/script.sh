@@ -10,8 +10,7 @@
 
 header 'Running script.sh...'
 
-# See https://github.com/travis-ci/travis-ci/issues/4596 (still open at the time of writting this comment) for the reason of this workaround
-commit_range="${TRAVIS_COMMIT_RANGE/.../..}"
+commit_range="${TRAVIS_COMMIT_RANGE/.../..}" # See https://github.com/travis-ci/travis-ci/issues/4596 (still open at time of writting)
 
 modified_casks=($(git diff --name-only --diff-filter=AM "${commit_range}" -- Casks/*.rb))
 ruby_files_added_outside_casks_dir=($(git diff --name-only --diff-filter=A "${commit_range}" -- *.rb))
