@@ -6,6 +6,12 @@
 # build. Do not attempt to source or run it locally.
 #
 # shellcheck disable=SC1090
+
+echo 'TESTING'
+git --version
+
+
+
 . "${TRAVIS_BUILD_DIR}/ci/travis/helpers.sh"
 
 header 'Running script.sh...'
