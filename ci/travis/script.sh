@@ -10,11 +10,14 @@
 
 header 'Running script.sh...'
 
-modified_casks=($(git diff --name-only --diff-filter=AM "${TRAVIS_COMMIT_RANGE}" -- Casks/*.rb))
-ruby_files_added_outside_casks_dir=($(find . -maxdepth 1 -type f | git diff --name-only --diff-filter=A "${TRAVIS_COMMIT_RANGE}" -- *.rb))
+modified_ruby_files=($(git diff --name-only --diff-filter=AM "${TRAVIS_COMMIT_RANGE}" -- *.rb))
 
-if [[ ${#ruby_files_added_outside_casks_dir[@]} -gt 0 ]]; then
-  odie "Casks added outside Casks directory: ${ruby_files_added_outside_casks_dir[@]}"
+for file in "${modified_ruby_files[@]}"; do
+  [[ "${file}" == 'Casks/'* ]] && modified_casks+=("${file}") || casks_wrong_dir+=("${file}")
+done
+
+if [[ ${#casks_wrong_dir[@]} -gt 0 ]]; then
+  odie "Casks added outside Casks directory: ${casks_wrong_dir[*]}"
 elif [[ ${#modified_casks[@]} -gt 0 ]]; then
   run brew cask _audit_modified_casks "${TRAVIS_COMMIT_RANGE}"
   run brew cask style "${modified_casks[@]}"
