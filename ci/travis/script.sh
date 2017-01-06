@@ -6,25 +6,17 @@
 # build. Do not attempt to source or run it locally.
 #
 # shellcheck disable=SC1090
-
-echo 'TESTING'
-git --version
-
-
-
 . "${TRAVIS_BUILD_DIR}/ci/travis/helpers.sh"
 
 header 'Running script.sh...'
 
-commit_range="${TRAVIS_COMMIT_RANGE/.../..}" # See https://github.com/travis-ci/travis-ci/issues/4596 (still open at time of writting)
-
-modified_casks=($(git diff --name-only --diff-filter=AM "${commit_range}" -- Casks/*.rb))
-ruby_files_added_outside_casks_dir=($(git diff --name-only --diff-filter=A "${commit_range}" -- *.rb))
+modified_casks=($(git diff --name-only --diff-filter=AM "${TRAVIS_COMMIT_RANGE}" -- Casks/*.rb))
+ruby_files_added_outside_casks_dir=($(find . -maxdepth 1 -type f | git diff --name-only --diff-filter=A "${TRAVIS_COMMIT_RANGE}" -- *.rb))
 
 if [[ ${#ruby_files_added_outside_casks_dir[@]} -gt 0 ]]; then
   odie "Casks added outside Casks directory: ${ruby_files_added_outside_casks_dir[@]}"
 elif [[ ${#modified_casks[@]} -gt 0 ]]; then
-  run brew cask _audit_modified_casks "${commit_range}"
+  run brew cask _audit_modified_casks "${TRAVIS_COMMIT_RANGE}"
   run brew cask style "${modified_casks[@]}"
 else
   ohai 'No casks modified, skipping'
